@@ -23,6 +23,7 @@ describe("Test Authentification", () => {
         cy.visit("https://preprod.backmarket.fr/fr-fr/register");
         cy.get("#signup-email").click({force: true}).type("lilie@gmail.com");
         cy.get("#signup-password").click({force: true}).type("Lilie33!");
+        cy.contains("Welcome Back!").click({force: true});
     });
 
 });
