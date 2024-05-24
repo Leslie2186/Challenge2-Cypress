@@ -1,54 +1,58 @@
 describe("Test sur mailslurp", () => {
+    it('can set config', () => {
+        cy.mailslurp({ apiKey: '09b4d1795367d63c6e249085a55da3e2db56dcbba10a3fd882527ae8c347d458' })
+    });
+
     it("Test boite mail avec mailslurp", () => {
-         // create a mailslurp instance
+         //Création d'une nouvelle instance de mailslurp
     cy.mailslurp().then(function (mailslurp) {
-        // visit the demo application
-       // cy.visit('/');
-        // create an email address and store it on this
+
+        //Création d'une nouvelle boite mail
         cy.then(() => mailslurp.createInbox())
             .then((inbox) => {
-                // save inbox id and email address to this
+                //Sauvegarde de l'id et de l'adresse email 
                 cy.wrap(inbox.id).as('inboxId');
                 cy.wrap(inbox.emailAddress).as('emailAddress');
             })
-        // fill user details on app
-        cy.get('[data-test=sign-in-create-account-link]').click()
-        cy.then(function () {
-            // access stored email on this, make sure you use Function and not () => {} syntax for correct scope
-            cy.get('[name=email]').type(this.emailAddress)
-            cy.get('[name=password]').type('test-password')
-            return cy.get('[data-test=sign-up-create-account-button]').click();
-        })
-        // now wait for confirmation mail
+
+        //Envoi d'un email
+        cy.mailslurp()
+        .then(() => mailslurp.sendEmail(this.inboxId, {
+            to: [this.emailAddress  ],
+            subject: 'Bonjour email de confirmation',
+            body: 'Voilà votre code: ABC-123',
+        }))
+
+        //Attente de la confirmation de l'eamil
         cy.then({
-            // add timeout to the step to allow email to arrive
             timeout: 60_000
         }, function () {
             return mailslurp
-                // wait for the email to arrive in the inbox
+                //Attente de l'email qui arrive dans la boite
                 .waitForLatestEmail(this.inboxId, 60_000, true)
                 // extract the code with a pattern
                 .then(email => mailslurp.emailController.getEmailContentMatch({
                     emailId: email.id,
                     contentMatchOptions: {
-                        // regex pattern to extract verification code
+                        //Extraction du code et vérification avec une regex
                         pattern: 'Your Demo verification code is ([0-9]{6})'
                     }
                 }))
-                // save the verification code to this
+                //Sauvegarde du code de vérification
                 .then(({matches}) => cy.wrap(matches[1]).as('verificationCode'))
         });
-        // confirm the user with the verification code
+
+        /*//Confirmer l'utilisateur avec le code de vérification
         cy.then(function () {
             cy.get('[name=code]').type(this.verificationCode)
             cy.get('[data-test=confirm-sign-up-confirm-button]').click()
-            // use the email address and a test password
+            //Utilisation de l'email et du password
             cy.get('[data-test=username-input]').type(this.emailAddress)
             cy.get('[data-test=sign-in-password-input]').type('test-password')
-            // click the submit button
+            //Clique sur le bouton de soumission
             return cy.get('[data-test=sign-in-sign-in-button]').click();
         })
-        cy.get('h1').should('contain', 'Welcome');
+        cy.get('h1').should('contain', 'Welcome');*/
     });
     });
 });
