@@ -111,5 +111,6 @@ describe("Test réinitialisation du mot de passe", () => {
         cy.url().should('eq',"https://preprod.backmarket.fr/fr-fr/password-reset/confirm");
         cy.url().should('include',"password-reset/confirm");
         cy.get("span.title-1").should('be.visible').and("contain.text", "Wouhou !");
+        cy.screenshot('reinitilisation_ok');
     })
 });
