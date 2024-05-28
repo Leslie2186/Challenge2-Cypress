@@ -11,4 +11,5 @@ module.exports = defineConfig({
       responseTimeout: 40000,
       requestTimeout: 40000
     },
+  videos: true  
 });
